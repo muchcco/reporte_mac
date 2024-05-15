@@ -69,9 +69,10 @@ class PagesController extends Controller
                        FOR Est_ate IN ([Abandono], [Llamando], [Cancelado], [Atención Cerrada], [En espera], [Error de selección], [Terminado], [Atención Iniciada], [0])
                    ) AS PivotTable
                    JOIN (
-                       SELECT Nom_mac, COUNT(*) AS TotalRegistros
+                       SELECT Nom_mac, COUNT(and ide_ser <> 130) AS TotalRegistros
                        FROM cre_atend
                        WHERE fec_ate BETWEEN '$startDate' AND '$endDate'
+                       and ide_ser <> 130
                        GROUP BY Nom_mac
                    ) AS TotalTable ON PivotTable.Nom_mac = TotalTable.Nom_mac
                    $nom_mac_condition";
