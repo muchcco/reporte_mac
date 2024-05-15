@@ -44,6 +44,7 @@
         "bLengthChange": true,
         "autoWidth": false,
         "searching": true,
+        pageLength : 50,
         info: true,
         "ordering": false,
         language: {"url": "{{ asset('js/Spanish.json')}}"}, 

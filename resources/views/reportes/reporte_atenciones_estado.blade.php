@@ -30,7 +30,7 @@
                     <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" value="{{$fecha6diasconvert}}">
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label class="mb-3">Fecha Fin:</label>
                     <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" value="{{$fecha6diasconvert}}">
@@ -54,7 +54,7 @@
         <div class="card-footer">
             <button class="btn btn-primary" id="filtro" onclick="execute_filter()">Buscar</button>
             <button class="btn btn-secondary" id="limpiar">limpiar</button>
-            <button class="btn btn-success">Exportar</button>
+            <button class="btn btn-success" onclick="ExportEXCEL()">Exportar</button>
         </div>
       </div>
 </div>
@@ -151,6 +151,24 @@ document.getElementById('nom_mac').value = "";
 tabla_seccion();
 
 })
+
+var ExportEXCEL = () => {
+    var fecha_inicio = document.getElementById('fecha_inicio').value;
+    var fecha_fin = document.getElementById('fecha_fin').value;
+    var nom_mac = document.getElementById('nom_mac').value;
+
+    // Define the route for exporting the report to Excel
+    var link_up = "{{ route('reportes.excel.estado_excel') }}";
+
+    // Create the URL with the variables as query parameters
+    var href = link_up + '?fecha_inicio=' + fecha_inicio + '&fecha_fin=' + fecha_fin + '&nom_mac=' + nom_mac;
+
+    console.log(href);
+
+    // Open the URL in the same tab
+    window.location.href = href;
+};
+
 
 </script>
 @endsection

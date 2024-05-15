@@ -9,7 +9,12 @@ Route::get('reportes/reporte_atenciones_estado' , [PagesController::class, 'repo
 
 // TABLAS CONSULTAS
 
+Route::get('reportes/tablas/tb_atenciones' , [PagesController::class, 'tb_atenciones'])->name('reportes.tablas.tb_atenciones');
 Route::get('reportes/tablas/tb_ate_estado' , [PagesController::class, 'tb_ate_estado'])->name('reportes.tablas.tb_ate_estado');
+
+// REPORTE EXCEL
+
+Route::get('reportes/excel/estado_excel' , [PagesController::class, 'estado_excel'])->name('reportes.excel.estado_excel');
 
 Auth::routes();
 
