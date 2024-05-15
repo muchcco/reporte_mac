@@ -1,48 +1,32 @@
-<aside class="main-sidebar">
-    <!-- sidebar: style can be found in sidebar.less -->
-    <section class="sidebar">
-      <!-- Sidebar user panel -->
-      <div class="user-panel">
-        <div class="pull-left image">
-          <img src="vendor/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
-        </div>
-        <div class="pull-left info">
-          <p>Alexander Pierce</p>
-          <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
-        </div>
-      </div>
-      <!-- search form -->
-      <form action="#" method="get" class="sidebar-form">
-        <div class="input-group">
-          <input type="text" name="q" class="form-control" placeholder="Search...">
-          <span class="input-group-btn">
-            <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button>
-          </span>
-        </div>
-      </form>
-      <!-- /.search form -->
-      <!-- sidebar menu: : style can be found in sidebar.less -->
-      <ul class="sidebar-menu">
-        <li class="header">MAIN NAVIGATION</li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-dashboard"></i> <span>Dashboard</span> <i class="fa fa-angle-left pull-right"></i>
-          </a>
-          <ul class="treeview-menu">
-            <li><a href="vendor/index.html"><i class="fa fa-circle-o"></i> Dashboard v1</a></li>
-          </ul>
-        </li>
-        <li class="treeview active">
-          <a href="#">
-            <i class="fa fa-folder"></i> <span>Examples</span>
-            <i class="fa fa-angle-left pull-right"></i>
-          </a>
-          <ul class="treeview-menu">
-            <li><a href="{{ route('reportes.reporte_atenciones') }}"><i class="fa fa-circle-o"></i> Atenciones</a></li>
-            <li class="active"><a href="blank.html"><i class="fa fa-circle-o"></i> Blank Page</a></li>
-          </ul>
-        </li>
-      </ul>
-    </section>
-    <!-- /.sidebar -->
-  </aside>
+
+<div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark sidebar" style="width: 280px;">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+      <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+      <span class="fs-4">REPORTES PCM</span>
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item">
+        <a href="{{ route('inicio') }}" class="nav-link @if (Request::is('/')) active @endif text-white" aria-current="page">
+          <svg class="bi me-2" width="16" height="16"></svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="{{ route('reportes.reporte_atenciones') }}" class="nav-link @if (Request::is('reportes/reporte_atenciones')) active @endif text-white">
+          <svg class="bi me-2" width="16" height="16"></svg>
+          REPORTE POR ATENCION
+        </a>
+      </li>
+      <li>
+        <a href="{{ route('reportes.reporte_atenciones_estado') }}" class="nav-link @if (Request::is('reportes/reporte_atenciones_estado')) active @endif text-white">
+          <svg class="bi me-2" width="16" height="16"></svg>
+          REPORTE POR ESTADO
+        </a>
+      </li>
+    </ul>
+    <hr>
+    <div class="dropdown">
+      <P>CENTROS MAC</P>
+    </div>
+  </div>
