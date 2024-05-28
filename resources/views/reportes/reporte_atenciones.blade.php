@@ -68,7 +68,7 @@
       <div class="card-footer">
           <button class="btn btn-primary" id="filtro" onclick="execute_filter()">Buscar</button>
           <button class="btn btn-secondary" id="limpiar">limpiar</button>
-          <button class="btn btn-success" onclick="ExportEXCEL()">Exportar</button>
+          <button class="btn btn-success" id="exportButton">Exportar</button>
       </div>
     </div>
 </div>
@@ -86,9 +86,26 @@
       </div>
   </div>
 </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="downloadModal" tabindex="-1" role="dialog" aria-labelledby="downloadModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="downloadModalLabel">Descargando...</h5>
+        </div>
+        <div class="modal-body">
+          <div class="progress">
+            <div id="downloadProgressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 @endsection
-
-
 @section('script')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="{{ asset('assets/datatables/datatables.min.js') }}"></script>
@@ -152,29 +169,46 @@ function validarBusqueda () {
 
 // EJECUTA LOS FILTROS Y ENVIA AL CONTROLLADOR PARA  MOSTRAR EL RESULTADO EN LA TABLA
 var execute_filter = () =>{
-   var fecha_inicio = $('#fecha_inicio').val();
+
+  o = validarBusqueda();
+
+  if(o.flag){
+
+    var fecha_inicio = $('#fecha_inicio').val();
     var fecha_fin = $('#fecha_fin').val();
     var nom_mac = $('#nom_mac').val();
     var servicio = $('#servicio').val();
-   $.ajax({
-        type:'get',
-        url: "{{ route('reportes.tablas.tb_atenciones') }}" ,
-        dataType: "",
-        data: {fecha_inicio : fecha_inicio, fecha_fin : fecha_fin, nom_mac: nom_mac, servicio: servicio},
-        beforeSend: function () {
-            document.getElementById("filtro").innerHTML = '<i class="fa fa-spinner fa-spin"></i> Buscando';
-            document.getElementById("filtro").style.disabled = true;
-        },
-        success:function(data){
-            document.getElementById("filtro").innerHTML = '<i class="fa fa-search"></i> Buscar';
-            document.getElementById("filtro").style.disabled = false;
-            tabla_seccion(fecha_inicio, fecha_fin, nom_mac, servicio);
-        },
-        error: function(xhr, status, error){
-            console.log("error");
-            console.log('Error:', error);
-        }
-   });
+    $.ajax({
+          type:'get',
+          url: "{{ route('reportes.tablas.tb_atenciones') }}" ,
+          dataType: "",
+          data: {fecha_inicio : fecha_inicio, fecha_fin : fecha_fin, nom_mac: nom_mac, servicio: servicio},
+          beforeSend: function () {
+              document.getElementById("filtro").innerHTML = '<i class="fa fa-spinner fa-spin"></i> Buscando';
+              document.getElementById("filtro").style.disabled = true;
+          },
+          success:function(data){
+              document.getElementById("filtro").innerHTML = '<i class="fa fa-search"></i> Buscar';
+              document.getElementById("filtro").style.disabled = false;
+              tabla_seccion(fecha_inicio, fecha_fin, nom_mac, servicio);
+          },
+          error: function(xhr, status, error){
+              console.log("error");
+              console.log('Error:', error);
+          }
+    });
+
+  }else{
+        // Swal.fire(o.mensaje);
+        Swal.fire({
+                    icon: "warning",
+                    text: o.mensaje,
+                    confirmButtonText: "Aceptar"
+                })
+        // $("#afArchivo").val("");
+    }
+
+   
 }
 
 $("#limpiar").on("click", function(e) {
@@ -190,12 +224,17 @@ $("#limpiar").on("click", function(e) {
     // Establecer los valores de fecha de inicio y fin a la fecha actual
     document.getElementById('fecha_inicio').value = currentDate;
     document.getElementById('fecha_fin').value = currentDate;
+   
     document.getElementById('nom_mac').value = "";
     document.getElementById('servicio').value = "";
+    $('#nom_mac').val('').trigger('change');
+    $('#servicio').val('').trigger('change');
 
     tabla_seccion();
 
 })
+
+/********************************************************** EXPORTAR *****************************************************************************/
 
 var ExportEXCEL = () => {
     var fecha_inicio = document.getElementById('fecha_inicio').value;
@@ -203,17 +242,61 @@ var ExportEXCEL = () => {
     var nom_mac = document.getElementById('nom_mac').value;
     var servicio = document.getElementById('servicio').value;
 
-    // Define the route for exporting the report to Excel
-    var link_up = "{{ route('reportes.excel.estado_excel') }}";
+    var link_up = "{{ route('reportes.excel.atencion_excel') }}";
 
-    // Create the URL with the variables as query parameters
     var href = link_up + '?fecha_inicio=' + fecha_inicio + '&fecha_fin=' + fecha_fin + '&nom_mac=' + nom_mac + '&servicio=' + servicio;
 
     console.log(href);
 
-    // Open the URL in the same tab
-    window.location.href = href;
+    $("#exportButton").prop('disabled', true);
+    $("#downloadModal").modal('show');
+
+    $.ajax({
+        url: href,
+        method: 'GET',
+        xhrFields: {
+            responseType: 'blob'
+        },
+        xhr: function() {
+            var xhr = new window.XMLHttpRequest();
+            xhr.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    var percentComplete = Math.round((e.loaded / e.total) * 100);
+                    $("#downloadProgressBar").css('width', percentComplete + '%');
+                    $("#downloadProgressBar").text(percentComplete + '%');
+                }
+            };
+            return xhr;
+        },
+        success: function (data, status, xhr) {
+            var a = document.createElement('a');
+            var url = window.URL.createObjectURL(data);
+            a.href = url;
+            a.download = 'atencion_excel.xlsx'; 
+            document.body.append(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+            $("#downloadModal").modal('hide');
+            $("#exportButton").prop('disabled', false);
+
+            Swal.fire({
+                icon: "success",
+                title: "Bien...",
+                text: "Se descargo el archivo correctamente..!",
+            });
+
+        },
+        error: function () {
+            alert('Error al exportar los datos.');
+
+            $("#downloadModal").modal('hide');
+            $("#exportButton").prop('disabled', false);
+        }
+    });
 };
+
+$("#exportButton").on("click", ExportEXCEL);
 
 
 </script>

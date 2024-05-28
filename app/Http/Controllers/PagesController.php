@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Exports\EstadosExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AtencionExport;
 
 class PagesController extends Controller
 {
@@ -78,6 +79,72 @@ class PagesController extends Controller
         
         // dd($data);
         return view('reportes.tablas.tb_atenciones', ['data' => $data]);
+    }
+
+    public function atencion_excel(Request $request)
+    {
+        if($request->nom_mac == ""){
+            $nombre_mac = 'TODOS';
+        }else{
+            $nombre_mac = $request->nom_mac;
+        }
+        $servicio = DB::table('par_ent')->where('ide_ent', $request->servicio)->first();
+        $nombre_entidad = $servicio->nom_ent;
+
+        $fecha_inicio = $request->fecha_inicio;
+        $fecha_fin = $request->fecha_fin;
+
+        $query = DB::table('cre_atend as c')
+                            ->join('par_ent as p', 'c.Ide_ser', '=', 'p.ide_ent')
+                            ->select(
+                                'c.Nom_mac',
+                                'p.nom_ent',
+                                'c.Hra_llg',
+                                'c.Hra_lla',
+                                'c.Tpo_esp',
+                                'c.Hra_ini',
+                                'c.Tpo_ate',
+                                'c.Fin_ate',
+                                'c.Tpo_tot',
+                                'c.Num_tik',
+                                'c.Est_ate',
+                                'c.Fec_ate',
+                                DB::raw("'Presencial' as presencial"),
+                                DB::raw("CASE c.des_pri
+                                            WHEN '1' THEN 'NO PREFERENCIAL'
+                                            ELSE 'PREFERENCIAL'
+                                        END as TIPO_aTE")
+                            )
+                            ->where(function($query) use ($request) {                                
+                                $fecha_I = date("Y-m-d");
+                                $fecha_F = date("Y-m-d");
+                                if($request->fecha_inicio != '' && $request->fecha_fin != '' ){
+                                    $query->where('fec_ate', '>=', $request->fecha_inicio);
+                                    $query->where('fec_ate', '<=', $request->fecha_fin);
+                                }else{
+                                    $query->where('fec_ate', '<=', $fecha_I);
+                                    $query->where('fec_ate', '>=', $fecha_F);
+                                }
+                            })
+                            ->where(function($query) use ($request) {
+                                if($request->servicio != '' ){
+                                    $query->where('Ide_ser', $request->servicio);
+                                }
+                            })
+                            // ->whereIn('Nom_mac', ['MAC Callao', 'MAC Ventanilla'])
+                            ->where(function($query) use ($request) {
+                                if($request->nom_mac == "0" ){
+                                    $query->whereIn('Nom_mac' , [$request->nom_mac]);
+                                }
+                            })
+                            ->orderBy('Nom_mac')
+                            ->orderBy('Fec_ate')
+                            ->get();
+
+
+        $export = Excel::download(new AtencionExport($query, $nombre_mac ,$fecha_inicio, $fecha_fin, $nombre_entidad), 'REPORTE '. $nombre_mac .'.xlsx');
+
+        return $export;
     }
 
     /********************************************************* REPORTES POR ESTADO ***************************************************************/

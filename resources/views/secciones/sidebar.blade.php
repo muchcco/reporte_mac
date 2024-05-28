@@ -9,13 +9,13 @@
       <li class="nav-item">
         <a href="{{ route('inicio') }}" class="nav-link @if (Request::is('/')) active @endif text-white" aria-current="page">
           <svg class="bi me-2" width="16" height="16"></svg>
-          Dashboard
+          DASHBOARD
         </a>
       </li>
       <li>
         <a href="{{ route('reportes.reporte_atenciones') }}" class="nav-link @if (Request::is('reportes/reporte_atenciones')) active @endif text-white">
           <svg class="bi me-2" width="16" height="16"></svg>
-          REPORTE POR ATENCION
+          REPORTE POR ATENCIÓN
         </a>
       </li>
       <li>

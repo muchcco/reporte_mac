@@ -15,6 +15,7 @@ Route::get('reportes/tablas/tb_ate_estado' , [PagesController::class, 'tb_ate_es
 // REPORTE EXCEL
 
 Route::get('reportes/excel/estado_excel' , [PagesController::class, 'estado_excel'])->name('reportes.excel.estado_excel');
+Route::get('reportes/excel/atencion_excel' , [PagesController::class, 'atencion_excel'])->name('reportes.excel.atencion_excel');
 
 Auth::routes();
 
