@@ -236,64 +236,88 @@ $("#limpiar").on("click", function(e) {
 
 /********************************************************** EXPORTAR *****************************************************************************/
 
+
+
+
+
 var ExportEXCEL = () => {
-    var fecha_inicio = document.getElementById('fecha_inicio').value;
-    var fecha_fin = document.getElementById('fecha_fin').value;
-    var nom_mac = document.getElementById('nom_mac').value;
-    var servicio = document.getElementById('servicio').value;
 
-    var link_up = "{{ route('reportes.excel.atencion_excel') }}";
+    o = validarBusqueda();
 
-    var href = link_up + '?fecha_inicio=' + fecha_inicio + '&fecha_fin=' + fecha_fin + '&nom_mac=' + nom_mac + '&servicio=' + servicio;
+    if(o.flag){
+            var fecha_inicio = document.getElementById('fecha_inicio').value;
+            var fecha_fin = document.getElementById('fecha_fin').value;
+            var nom_mac = document.getElementById('nom_mac').value;
+            var servicio = document.getElementById('servicio').value;
 
-    console.log(href);
+            var link_up = "{{ route('reportes.excel.atencion_excel') }}";
 
-    $("#exportButton").prop('disabled', true);
-    $("#downloadModal").modal('show');
+            var href = link_up + '?fecha_inicio=' + fecha_inicio + '&fecha_fin=' + fecha_fin + '&nom_mac=' + nom_mac + '&servicio=' + servicio;
 
-    $.ajax({
-        url: href,
-        method: 'GET',
-        xhrFields: {
-            responseType: 'blob'
-        },
-        xhr: function() {
-            var xhr = new window.XMLHttpRequest();
-            xhr.onprogress = function(e) {
-                if (e.lengthComputable) {
-                    var percentComplete = Math.round((e.loaded / e.total) * 100);
-                    $("#downloadProgressBar").css('width', percentComplete + '%');
-                    $("#downloadProgressBar").text(percentComplete + '%');
+            console.log(href);
+
+            $("#exportButton").prop('disabled', true);
+            $("#downloadModal").modal('show');
+
+            $.ajax({
+                url: href,
+                method: 'GET',
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.onprogress = function(e) {
+                        if (e.lengthComputable) {
+                            var percentComplete = Math.round((e.loaded / e.total) * 100);
+                            $("#downloadProgressBar").css('width', percentComplete + '%');
+                            $("#downloadProgressBar").text(percentComplete + '%');
+                        }
+                    };
+                    return xhr;
+                },
+                success: function (data, status, xhr) {
+                    console.log(status);
+                    var a = document.createElement('a');
+                        var url = window.URL.createObjectURL(data);
+                        a.href = url;
+                        a.download = 'atencion_excel.xlsx'; 
+                        document.body.append(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        a.remove();
+                        $("#downloadModal").modal('hide');
+                        $("#exportButton").prop('disabled', false);
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Bien...",
+                            text: "Se descargo el archivo correctamente..!",
+                        });
+
+                },
+                error: function () {
+                    // alert('Error al exportar los datos.\nPosiblemente no hay datos para esta búsqueda');
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "Ups...",
+                        html: "Error al exportar los datos.<br/>Posiblemente no hay datos para esta búsqueda",
+                    });
+
+                    $("#downloadModal").modal('hide');
+                    $("#exportButton").prop('disabled', false);
                 }
-            };
-            return xhr;
-        },
-        success: function (data, status, xhr) {
-            var a = document.createElement('a');
-            var url = window.URL.createObjectURL(data);
-            a.href = url;
-            a.download = 'atencion_excel.xlsx'; 
-            document.body.append(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
-            $("#downloadModal").modal('hide');
-            $("#exportButton").prop('disabled', false);
-
-            Swal.fire({
-                icon: "success",
-                title: "Bien...",
-                text: "Se descargo el archivo correctamente..!",
             });
-
-        },
-        error: function () {
-            alert('Error al exportar los datos.');
-
-            $("#downloadModal").modal('hide');
-            $("#exportButton").prop('disabled', false);
-        }
-    });
+        }else{
+        // Swal.fire(o.mensaje);
+        Swal.fire({
+                    icon: "warning",
+                    text: o.mensaje,
+                    confirmButtonText: "Aceptar"
+                })
+        // $("#afArchivo").val("");
+    }
 };
 
 $("#exportButton").on("click", ExportEXCEL);

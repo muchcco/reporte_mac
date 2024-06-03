@@ -56,6 +56,18 @@
             vertical-align: middle !important;
             text-align: center !important;
         }
+
+        .bg-head{
+            background-color: #2352a2 !important;
+        }
+
+        .active{
+            border-left: 10px solid #616161;
+        }
+
+        .bi{
+            padding-bottom: .23em;
+        }
       </style>
 </head>
 <body>        
@@ -66,9 +78,9 @@
         
         <section id="principal">
             <div class="header">
-                <nav class="navbar navbar-dark bg-dark">
+                <nav class="navbar navbar-dark bg-head">
                     <div class="container-fluid">
-                      <a class="navbar-brand" href="#">REPORTE</a>
+                      <a class="navbar-brand" href="#">REPORTE MAC</a>
                     </div>
                   </nav>
             </div>

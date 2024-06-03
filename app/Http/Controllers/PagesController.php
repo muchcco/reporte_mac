@@ -90,6 +90,7 @@ class PagesController extends Controller
         }
         $servicio = DB::table('par_ent')->where('ide_ent', $request->servicio)->first();
         $nombre_entidad = $servicio->nom_ent;
+        
 
         $fecha_inicio = $request->fecha_inicio;
         $fecha_fin = $request->fecha_fin;
@@ -140,6 +141,18 @@ class PagesController extends Controller
                             ->orderBy('Nom_mac')
                             ->orderBy('Fec_ate')
                             ->get();
+
+        // // dd($query);
+    
+        if($query->nom_ent == null){
+            $response_ = response()->json([
+                'data' => null,                
+                'message' => 'No hay datos disponibles para esta busqueda...',
+                'status' => 201,
+            ], 400);
+
+            return $response_;
+        }
 
 
         $export = Excel::download(new AtencionExport($query, $nombre_mac ,$fecha_inicio, $fecha_fin, $nombre_entidad), 'REPORTE '. $nombre_mac .'.xlsx');
