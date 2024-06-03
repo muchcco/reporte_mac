@@ -143,16 +143,6 @@ class PagesController extends Controller
                             ->get();
 
         // // dd($query);
-    
-        if($query->nom_ent == null){
-            $response_ = response()->json([
-                'data' => null,                
-                'message' => 'No hay datos disponibles para esta busqueda...',
-                'status' => 201,
-            ], 400);
-
-            return $response_;
-        }
 
 
         $export = Excel::download(new AtencionExport($query, $nombre_mac ,$fecha_inicio, $fecha_fin, $nombre_entidad), 'REPORTE '. $nombre_mac .'.xlsx');
